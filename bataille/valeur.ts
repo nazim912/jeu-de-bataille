@@ -1,0 +1,15 @@
+export enum Value{
+    deux= "deux",
+    trois= "trois",
+    quatre= "quatre",
+    cinq= "cinq",
+    six= "six",
+    sept= "sept",
+    huit= "huit",
+    neuf= "neuf",
+    dix= "dix",
+    J= "valet",
+    Q= "reine",
+    K= "roi",
+    A= "as",
+}
