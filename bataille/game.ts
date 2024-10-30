@@ -5,58 +5,97 @@ import { Player } from "./player";
 export class Game {
     public player1: Player
     public player2: Player
-    public deck: Deck
 
-    constructor(player1name: string, player2name: string, deck: Deck) {
-        this.player1 = new Player(player1name)
-        this.player2 = new Player(player2name)
-        this.deck = deck
+    constructor(player1: string, player2: string) {
+        this.player1 = new Player(player1)
+        this.player2 = new Player(player2)
     }
-    public compareCard(card1: Card, card2: Card): void {
-        console.log(`Le joueur 1 joue : ${card1.value}de ${card1.color}`)
-        console.log(`Le joueur 2 joue : ${card2.value}de ${card2.color}`)
-        if (card1.value > card2.value) {
+
+    private compareCard(card1: Card, card2: Card): void {
+        console.log(`Le joueur 1 joue : ${card1.display()}`)
+        console.log(`Le joueur 2 joue : ${card2.display()}`)
+
+        if (card1.getValue() > card2.getValue()) {
             this.player1.addCard(card1)
             this.player1.addCard(card2)
             console.log("Joueur 1 remporte la manche")
-        } else if (card1.value < card2.value) {
+
+        } else if (card1.getValue() < card2.getValue()) {
             this.player2.addCard(card1)
             this.player2.addCard(card2)
             console.log("Joueur 2 remporte la manche")
+
         } else {
             this.bataille()
         }
     }
-    public win(): string | undefined {
-        if (this.player1.deck.cards.length == 0) {
-            return "Le joueur 2 a gagné"
-        } else if (this.player2.deck.cards.length == 0) {
-            return "Le joueur 1 a gagné"
-        }
+
+    public getPlayers():Player[]{
+        return [this.player1,this.player2];
     }
-    bataille(): void {
-        let cardFaceCache1 = this.player1.drawCard()
-        let cardFaceCache2 = this.player2.drawCard()
-        let cardFace1 = this.player1.drawCard()
-        let cardFace2 = this.player2.drawCard()
+    
+    public play(): void {
+        this.deal();
+        this.gameloop();        
+    }
 
-        if (cardFaceCache1 && cardFaceCache2 && cardFace1 && cardFace2 !=undefined) {
-            console.log(`Le joueur 1 joue : ${cardFace1.value} et le joueur 2 joue : ${cardFace2.value}`)
+    public deal(): void {
+        let deck: Deck = new Deck();
+        deck.createDeck();
+        deck.shuffle()
+        while (!deck.isEmpty()) {
+            let card1 = deck.drawCard()
+            let card2 = deck.drawCard()
+            if (card1 != undefined) {
+                this.player1.addCard(card1)
+            }
+            if (card2 != undefined) {
+                this.player2.addCard(card2)
+            }
+        }
+        return
+    }
 
-            if (cardFace1.value > cardFace2.value) {
+    private gameloop():Player{
+        let winner : Player|undefined = undefined
+        while (winner == undefined) {
+            let card1 = this.player1.play()
+            let card2 = this.player2.play()
+
+            if (card1 && card2 != undefined) {
+                this.compareCard(card1, card2)
+            }
+
+            winner = this.win();
+        }
+
+        return winner;
+    }
+
+    private bataille(): void {
+        let cardFaceCache1 = this.player1.play()
+        let cardFaceCache2 = this.player2.play()
+        let cardFace1 = this.player1.play()
+        let cardFace2 = this.player2.play()
+
+        if (cardFaceCache1 && cardFaceCache2 && cardFace1 && cardFace2 != undefined) {
+            console.log(`Les deux joueurs jouent 1 carte face cachée`)
+            console.log(`Le joueur 1 joue : ${cardFace1.getValue()} et le joueur 2 joue : ${cardFace2.getValue()}`)
+
+            if (cardFace1.getValue() > cardFace2.getValue()) {
                 console.log("Le joueur 1 remporte la bataille")
                 this.player1.addCard(cardFaceCache1)
                 this.player1.addCard(cardFaceCache2)
                 this.player1.addCard(cardFace1)
                 this.player1.addCard(cardFace2)
 
-            } else if (cardFace1.value < cardFace2.value) {
+            } else if (cardFace1.getValue() < cardFace2.getValue()) {
                 console.log("Le joueur 2 remporte la bataille")
                 this.player2.addCard(cardFaceCache1)
                 this.player2.addCard(cardFaceCache2)
                 this.player2.addCard(cardFace1)
                 this.player2.addCard(cardFace2)
-                
+
             } else {
                 console.log("égalité, une autre bataille commence")
                 this.bataille()
@@ -65,12 +104,22 @@ export class Game {
             console.log("Un joueur n a plus de cartes")
 
         }
-
-            if (this.player1.deck.cards.length < 2) {
-                console.log("Le joueur 1 n a plus de carte le joueur 2 gagne");
-            } else if (this.player2.deck.cards.length < 2) {
-                console.log("Le joueur 2 n a plus de cartes le joueur 1 gagne");
-            }
-            return
+        if (this.player1.getNbCards() < 2) {
+            console.log("Le joueur 1 n a plus de carte le joueur 2 gagne");
+        } else if (this.player2.getNbCards() < 2) {
+            console.log("Le joueur 2 n'a plus de cartes le joueur 1 gagne");
         }
+        return
+    }
+
+    public win(): Player | undefined {
+        if (this.player1.getNbCards() == 0) {
+            return this.player2;
+
+        } else if (this.player2.getNbCards() == 0) {
+            return this.player1
+        }
+
+        return undefined;
+    }
 }

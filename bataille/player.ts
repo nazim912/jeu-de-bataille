@@ -3,22 +3,35 @@ import { Deck } from "./deck";
 
 export class Player {
     private name: string
-    public deck: Deck
+    private deck: Deck
 
     constructor(name: string) {
         this.name = name
-        this.deck = new Deck([])
+        this.deck= new Deck();
     }
-
+    
     public getName(): string {
         return this.name
     }
 
-    public addCard(card: Card): void {
-        this.deck.cards.push(card)
+    public getNbCards():number{
+        return this.deck.getNbCards();
     }
 
-    public drawCard(): Card | undefined {
-        return this.deck.cards.pop()
+    public addCard(card:Card):void{
+        this.deck.addCard(card);
     }
+
+    public retrieveCards(d:Deck):void{
+
+    }
+
+    public play():Card|undefined{
+        return this.deck.drawCard();
+    }
+
+    public display():string{
+        return this.deck.displayDeck();
+    }
+
 }

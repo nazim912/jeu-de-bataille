@@ -1,25 +1,47 @@
 import { Card } from "./card"
 import { Color } from "./color"
-import { Player } from "./player"
 import { Value } from "./valeur"
 
 export class Deck {
-    public cards: Card[]
-    public player1: Player
-    public player2: Player
-
-    constructor(cards: Card[], player1: Player = new Player("Player 1"), player2: Player = new Player("Player 2")) {
-        this.cards = cards
-        this.player1 = player1
-        this.player2 = player2
+    private cards: Card[]
+    constructor() {
+        this.cards = []
     }
-    public createDeck(){
 
+    public getNbCards():number{
+        return this.cards.length;
     }
-    public shuffle() {
 
+    public isEmpty():boolean{
+        return this.cards.length == 0;
     }
-    public deal() {
-        
+    
+    public createDeck():void{
+        for(let i=0;i<13;i++){
+            for(let j=0;j<4;j++){
+            this.cards.push(new Card(i as Value,j as Color))
+        }
+    }
+    }
+    public shuffle(): void {
+        for (let i = this.cards.length-1; i > 0; i--) {
+            let j =Math.floor(Math.random() * i);
+            let a=this.cards[i]
+            this.cards[i]=this.cards[j]
+            this.cards[j]=a
+        }
+    }
+    public addCard(card: Card): void {
+        this.cards.push(card)
+    }
+    public drawCard(): Card | undefined {
+        return this.cards.shift()
+    }
+    public displayDeck(): string {
+        let display:string=""
+        for (let i = 0; i < this.cards.length; i++) {            
+            display+=this.cards[i].display()+'\n'
+        }
+        return display
     }
 }
